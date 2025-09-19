@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tools Landing Page</title>
+  <link rel="stylesheet" href="shared/styles.css">
+  <link rel="stylesheet" href="shared/home.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>My Microsoft 365 Tools</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <main class="landing-main">
+      <div class="tool-grid">
+        <section class="tool-card">
+          <h2>Microsoft Graph Access Token</h2>
+          <p>Paste your Microsoft Graph Explorer access token once and reuse it across every tool in this workspace.</p>
+          <div class="help-info">
+            <h4>How to get your access token:</h4>
+            <ol>
+              <li>Open the <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noreferrer">Microsoft Graph Explorer</a>.</li>
+              <li>Sign in with your Microsoft work account.</li>
+              <li>Run any sample query and open the <strong>Access Token</strong> tab.</li>
+              <li>Copy the entire token and paste it below.</li>
+            </ol>
+          </div>
+          <div class="form-group">
+            <label for="graphToken">Access Token</label>
+            <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
+          </div>
+          <div class="meta" id="tokenMeta">No token stored yet.</div>
+          <div class="button-row">
+            <button class="btn btn-secondary" id="clearTokenButton" type="button">Clear Token</button>
+          </div>
+        </section>
+
+        <section class="tool-card">
+          <h2>Organization License Viewer</h2>
+          <p>Visualize organizational hierarchy, highlight ChatGPT license coverage, and explore team composition with interactive charts.</p>
+          <div class="meta">
+            <span>📂 <strong>Data:</strong> Microsoft Graph users &amp; licenses</span>
+            <span>🛠️ <strong>Features:</strong> Filtering, statistics, CSV export</span>
+          </div>
+          <a class="btn btn-primary" href="org-license-viewer/index.html">Open Viewer</a>
+        </section>
+
+        <section class="tool-card">
+          <h2>Profile Data Appender</h2>
+          <p>Append Microsoft 365 profile details to any CSV or Excel list of users and export enriched datasets in seconds.</p>
+          <div class="meta">
+            <span>📂 <strong>Data:</strong> Microsoft Graph profiles</span>
+            <span>🛠️ <strong>Features:</strong> CSV/XLSX import, selective fields, downloads</span>
+          </div>
+          <a class="btn btn-primary" href="user-data-appender/index.html">Open Appender</a>
+        </section>
+
+        <section class="tool-card coming-soon">
+          <h2>More tools coming soon</h2>
+          <p>Stay tuned for additional utilities that build on this shared foundation of styling, layout, and Microsoft Graph access.</p>
+          <div class="meta">Have an idea? Add a new folder and link it here.</div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="shared/ui.js"></script>
+  <script src="shared/graph-token.js"></script>
+  <script>
+    function updateTokenMeta(currentToken) {
+      const meta = document.getElementById('tokenMeta');
+      if (!meta) {
+        return;
+      }
+
+      if (!currentToken) {
+        meta.textContent = 'No token stored yet.';
+        return;
+      }
+
+      const truncated = `${currentToken.slice(0, 16)}…${currentToken.slice(-8)}`;
+      meta.textContent = `Token stored for this session (${currentToken.length} characters, preview: ${truncated}).`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      AppUI.initialize();
+      GraphTokenManager.initialize();
+      GraphTokenManager.subscribe(updateTokenMeta);
+
+      const clearButton = document.getElementById('clearTokenButton');
+      if (clearButton) {
+        clearButton.addEventListener('click', () => {
+          GraphTokenManager.clearToken();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

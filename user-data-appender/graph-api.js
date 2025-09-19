@@ -225,7 +225,9 @@ const GraphAPI = (function() {
         DataTable.loadData(columns, filteredRows);
         updateStatus('loadStatus', `${file.name} loaded successfully (${filteredRows.length} rows).`, 'success');
         if (uploadArea) uploadArea.classList.add('has-file');
-        setSectionCollapsed('loadSection', true);
+        if (typeof AppUI !== 'undefined') {
+          AppUI.setSectionCollapsed('loadSection', true);
+        }
         updateStatus('fetchStatus', '');
         updateDownloadButtons();
         updateFetchButtonState();
@@ -263,7 +265,9 @@ const GraphAPI = (function() {
     updateStatus('loadStatus', `Loaded ${rows.length} email${rows.length === 1 ? '' : 's'} from pasted list.`, 'success');
     const uploadArea = document.getElementById('fileUploadArea');
     if (uploadArea) uploadArea.classList.remove('has-file');
-    setSectionCollapsed('loadSection', true);
+    if (typeof AppUI !== 'undefined') {
+      AppUI.setSectionCollapsed('loadSection', true);
+    }
     updateStatus('fetchStatus', '');
     updateDownloadButtons();
     updateFetchButtonState();
@@ -517,16 +521,6 @@ const GraphAPI = (function() {
   }
 
   function attachEventListeners() {
-    const tokenInput = document.getElementById('graphToken');
-    if (tokenInput) {
-      tokenInput.addEventListener('input', event => {
-        accessToken = event.target.value.trim();
-        loginDomain = accessToken ? extractDomainFromToken(accessToken) : '';
-        updateDetectedDomainHint();
-        updateFetchButtonState();
-      });
-    }
-
     const fileInput = document.getElementById('dataFile');
     if (fileInput) {
       fileInput.addEventListener('change', handleFileUpload);
@@ -575,11 +569,18 @@ const GraphAPI = (function() {
 
   return {
     initialize: function() {
+      if (typeof GraphTokenManager !== 'undefined') {
+        GraphTokenManager.subscribe(value => {
+          accessToken = value.trim();
+          loginDomain = accessToken ? extractDomainFromToken(accessToken) : '';
+          updateDetectedDomainHint();
+          updateFetchButtonState();
+        });
+      }
+
       attachEventListeners();
       updateAppendModeUI();
       updateDownloadButtons();
-      updateDetectedDomainHint();
-      updateFetchButtonState();
     },
 
     updateDownloadButtons,

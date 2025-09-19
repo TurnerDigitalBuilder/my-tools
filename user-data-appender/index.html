@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Microsoft Profile Data Appender</title>
+  <link rel="stylesheet" href="../shared/styles.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,14 +12,14 @@
     <header class="header">
       <h1>Microsoft Profile Data Appender</h1>
       <div class="header-actions">
-        <button class="btn btn-secondary" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
       </div>
     </header>
 
     <div class="main-content">
       <aside class="setup-panel" id="setupPanel">
         <div class="collapsible-section">
-          <div class="collapsible-header" onclick="toggleSection('tokenSection')">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
             <span class="collapse-icon" id="tokenSectionIcon">▼</span>
             <h3 style="margin: 0;">Microsoft Graph Token</h3>
           </div>
@@ -46,7 +47,7 @@
         </div>
 
         <div class="collapsible-section" id="loadSectionContainer">
-          <div class="collapsible-header" onclick="toggleSection('loadSection')">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
             <span class="collapse-icon" id="loadSectionIcon">▼</span>
             <h3 style="margin: 0;">Load Email Data</h3>
           </div>
@@ -150,37 +151,17 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/graph-token.js"></script>
   <script src="visualization.js"></script>
   <script src="graph-api.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      AppUI.initialize();
+      GraphTokenManager.initialize();
       DataTable.initialize();
       GraphAPI.initialize();
     });
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    function toggleSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      const isCollapsed = section && section.style.display === 'none';
-      setSectionCollapsed(sectionId, !isCollapsed);
-    }
-
-    function setSectionCollapsed(sectionId, collapsed) {
-      const section = document.getElementById(sectionId);
-      const icon = document.getElementById(sectionId + 'Icon');
-      if (!section || !icon) return;
-
-      if (collapsed) {
-        section.style.display = 'none';
-        icon.textContent = '▶';
-      } else {
-        section.style.display = 'block';
-        icon.textContent = '▼';
-      }
-    }
   </script>
 </body>
 </html>

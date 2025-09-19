@@ -327,7 +327,9 @@ const GraphAPI = (function() {
     // Fetch organization data
     fetchOrgData: async function() {
       // Get input values
-      accessToken = document.getElementById('graphToken').value.trim();
+      accessToken = typeof GraphTokenManager !== 'undefined'
+        ? GraphTokenManager.getToken()
+        : '';
       startingEmail = document.getElementById('startingEmail').value.trim();
       maxUsers = parseInt(document.getElementById('maxUsers').value) || 100;
       const maxDepth = parseInt(document.getElementById('maxDepth').value) || 4;
