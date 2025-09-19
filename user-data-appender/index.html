@@ -12,6 +12,7 @@
     <header class="header">
       <h1>Microsoft Profile Data Appender</h1>
       <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
         <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
       </div>
     </header>
@@ -159,6 +160,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       AppUI.initialize();
       GraphTokenManager.initialize();
+      AppUI.setSectionCollapsed('tokenSection', true);
+      AppUI.setSectionCollapsed('loadSection', true);
       DataTable.initialize();
       GraphAPI.initialize();
     });
