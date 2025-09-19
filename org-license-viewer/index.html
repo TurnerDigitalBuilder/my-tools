@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organization Chart Visualizer with ChatGPT License Tracking</title>
+  <link rel="stylesheet" href="../shared/styles.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-container">
     <header class="header">
       <h1>Organization Chart Visualizer</h1>
-      <button class="btn btn-secondary" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+      <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
     </header>
     
     <div class="main-content">
@@ -19,7 +20,7 @@
         
         <!-- Collapsible Load Section -->
         <div class="collapsible-section">
-          <div class="collapsible-header" onclick="toggleSection('loadSection')">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
             <span class="collapse-icon" id="loadSectionIcon">▼</span>
             <h3 style="margin: 0;">Load Organization Data</h3>
           </div>
@@ -140,7 +141,7 @@
         
         <!-- Chart Controls Section -->
         <div class="collapsible-section" id="chartControlsSection" style="display: none;">
-          <div class="collapsible-header" onclick="toggleSection('controlsContent')">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('controlsContent')">
             <span class="collapse-icon" id="controlsContentIcon">▼</span>
             <h3 style="margin: 0;">Chart Controls</h3>
           </div>
@@ -303,34 +304,18 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   
   <!-- Application Scripts -->
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/graph-token.js"></script>
   <script src="graph-api.js"></script>
   <script src="visualization.js"></script>
-  
+
   <script>
-    // Initialize application
     document.addEventListener('DOMContentLoaded', () => {
+      AppUI.initialize();
+      GraphTokenManager.initialize();
       GraphAPI.initialize();
       OrgChart.initialize();
     });
-    
-    // Dark mode toggle
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-    
-    // Toggle collapsible sections
-    function toggleSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      const icon = document.getElementById(sectionId + 'Icon');
-      
-      if (section.style.display === 'none') {
-        section.style.display = 'block';
-        icon.textContent = '▼';
-      } else {
-        section.style.display = 'none';
-        icon.textContent = '▶';
-      }
-    }
   </script>
 </body>
 </html>
