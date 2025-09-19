@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microsoft Profile Data Appender</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>Microsoft Profile Data Appender</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="setup-panel" id="setupPanel">
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="toggleSection('tokenSection')">
+            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
+            <h3 style="margin: 0;">Microsoft Graph Token</h3>
+          </div>
+
+          <div class="collapsible-content" id="tokenSection">
+            <div class="wizard-step">
+              <h3>Get an Access Token</h3>
+              <div class="help-info">
+                <h4>How to get your Graph Token:</h4>
+                <ol>
+                  <li>Go to <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank">Microsoft Graph Explorer</a></li>
+                  <li>Sign in with your Microsoft 365 work account</li>
+                  <li>Run any sample query, then open the <strong>Access Token</strong> tab on the left</li>
+                  <li>Copy the entire token string and paste it below</li>
+                </ol>
+              </div>
+
+              <div class="form-group">
+                <label for="graphToken">Access Token:</label>
+                <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
+                <span class="form-hint" id="detectedDomainHint">Detected sign-in domain: not detected yet.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-section" id="loadSectionContainer">
+          <div class="collapsible-header" onclick="toggleSection('loadSection')">
+            <span class="collapse-icon" id="loadSectionIcon">▼</span>
+            <h3 style="margin: 0;">Load Email Data</h3>
+          </div>
+
+          <div class="collapsible-content" id="loadSection">
+            <div class="wizard-step">
+              <h3>Upload CSV or Excel</h3>
+              <p class="helper-text">Upload a list of users or paste email addresses to build the table.</p>
+
+              <div class="file-upload" id="fileUploadArea">
+                <input type="file" id="dataFile" accept=".csv,.xlsx,.xls">
+                <label class="file-upload-label" for="dataFile">
+                  📁 Click to upload or drag in a CSV/XLSX file<br>
+                  <small>First row should contain column headers.</small>
+                </label>
+              </div>
+
+              <div class="divider"><span>or</span></div>
+
+              <div class="form-group">
+                <label for="pasteEmails">Paste Email List:</label>
+                <textarea id="pasteEmails" placeholder="user1@contoso.com&#10;user2@contoso.com"></textarea>
+              </div>
+
+              <button class="btn btn-secondary" id="pasteLoadButton">Load Pasted Emails</button>
+              <div id="loadStatus" class="status-message" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-step" id="fieldOptions">
+          <h3>Profile Fields to Append</h3>
+          <p class="helper-text">Select the Microsoft 365 profile details to retrieve for each user.</p>
+
+          <div class="checkbox-grid" id="fieldCheckboxes">
+            <label><input type="checkbox" value="displayName" checked>Display Name</label>
+            <label><input type="checkbox" value="jobTitle" checked>Job Title</label>
+            <label><input type="checkbox" value="department" checked>Department</label>
+            <label><input type="checkbox" value="officeLocation">Office Location</label>
+            <label><input type="checkbox" value="companyName">Company Name</label>
+            <label><input type="checkbox" value="mail">Mail</label>
+            <label><input type="checkbox" value="userPrincipalName">User Principal Name</label>
+            <label><input type="checkbox" value="businessPhones">Business Phones</label>
+            <label><input type="checkbox" value="mobilePhone">Mobile Phone</label>
+            <label><input type="checkbox" value="preferredLanguage">Preferred Language</label>
+            <label><input type="checkbox" value="givenName">Given Name</label>
+            <label><input type="checkbox" value="surname">Surname</label>
+          </div>
+
+          <div class="form-group">
+            <label>Append Location:</label>
+            <div class="inline-options">
+              <label class="inline-option"><input type="radio" name="appendMode" value="end" checked> Append to end</label>
+              <label class="inline-option"><input type="radio" name="appendMode" value="index"> Insert at column</label>
+              <input type="number" id="insertIndex" class="small-input" min="1" placeholder="Column position" disabled>
+            </div>
+            <small class="form-hint">Use a 1-based column number (e.g., 3 inserts before the current third column).</small>
+          </div>
+
+          <button class="btn btn-primary" id="fetchButton" disabled>Fetch Profile Data</button>
+          <div id="fetchStatus" class="status-message" style="display: none;"></div>
+        </div>
+
+        <div class="wizard-step">
+          <h3>Download Updated Table</h3>
+          <p class="helper-text">Export the current table, including any appended profile data.</p>
+          <div class="button-row">
+            <button class="btn btn-secondary" id="downloadCsvButton" disabled>⬇️ Download CSV</button>
+            <button class="btn btn-secondary" id="downloadExcelButton" disabled>⬇️ Download Excel</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="viz-container">
+        <div class="table-container">
+          <div class="table-toolbar">
+            <div id="tableSummary">Upload a CSV or Excel file to begin.</div>
+            <div class="table-actions">
+              <button class="btn btn-danger" id="deleteSelectedButton" disabled data-label="🗑️ Delete Selected">🗑️ Delete Selected</button>
+            </div>
+          </div>
+          <div class="table-wrapper" id="tableWrapper">
+            <table id="dataTable">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+            <div class="table-empty-state" id="tableEmptyState">
+              <p>No data loaded yet.</p>
+              <p class="helper-text">Upload a CSV/Excel file or paste an email list to populate the table.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Processing...</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="visualization.js"></script>
+  <script src="graph-api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      DataTable.initialize();
+      GraphAPI.initialize();
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function toggleSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      const isCollapsed = section && section.style.display === 'none';
+      setSectionCollapsed(sectionId, !isCollapsed);
+    }
+
+    function setSectionCollapsed(sectionId, collapsed) {
+      const section = document.getElementById(sectionId);
+      const icon = document.getElementById(sectionId + 'Icon');
+      if (!section || !icon) return;
+
+      if (collapsed) {
+        section.style.display = 'none';
+        icon.textContent = '▶';
+      } else {
+        section.style.display = 'block';
+        icon.textContent = '▼';
+      }
+    }
+  </script>
+</body>
+</html>
