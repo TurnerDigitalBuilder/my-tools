@@ -11,51 +11,63 @@
   <div class="app-container">
     <header class="header">
       <h1>Organization Chart Visualizer</h1>
-      <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
     </header>
     
     <div class="main-content">
       <!-- Setup Panel -->
       <div class="setup-panel" id="setupPanel">
-        
+
+        <!-- Microsoft Graph Token -->
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
+            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
+            <h3 style="margin: 0;">Microsoft Graph Token</h3>
+          </div>
+
+          <div class="collapsible-content" id="tokenSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number" id="step1Number">1</span>
+                Connect to Microsoft Graph
+              </h3>
+
+              <div class="help-info">
+                <h4>How to get your Graph Token:</h4>
+                <ol>
+                  <li>Go to <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noreferrer">Microsoft Graph Explorer</a></li>
+                  <li>Sign in with your Microsoft work account</li>
+                  <li>Open the <strong>Access Token</strong> tab on the left</li>
+                  <li>Copy the entire token and paste it below</li>
+                </ol>
+              </div>
+
+              <div class="form-group">
+                <label for="graphToken">Access Token:</label>
+                <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Collapsible Load Section -->
         <div class="collapsible-section">
           <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
             <span class="collapse-icon" id="loadSectionIcon">▼</span>
             <h3 style="margin: 0;">Load Organization Data</h3>
           </div>
-          
+
           <div class="collapsible-content" id="loadSection">
-            <!-- Step 1: Graph Token -->
-            <div class="wizard-step">
-              <h3>
-                <span class="step-number" id="step1Number">1</span>
-                Microsoft Graph Token
-              </h3>
-              
-              <div class="help-info">
-                <h4>How to get your Graph Token:</h4>
-                <ol>
-                  <li>Go to <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank">Microsoft Graph Explorer</a></li>
-                  <li>Sign in with your Microsoft work account</li>
-                  <li>Click "Access Token" tab on the left</li>
-                  <li>Copy the entire token and paste it below</li>
-                </ol>
-              </div>
-              
-              <div class="form-group">
-                <label for="graphToken">Access Token:</label>
-                <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
-              </div>
-            </div>
-            
             <!-- Step 2: Starting Point -->
             <div class="wizard-step">
               <h3>
                 <span class="step-number" id="step2Number">2</span>
                 Starting User
               </h3>
-              
+
               <div class="form-group">
                 <label for="startingEmail">Starting User Email:</label>
                 <div style="position: relative;">
@@ -69,7 +81,7 @@
                   Start typing or select from previous searches
                 </small>
               </div>
-              
+
               <div class="form-group">
                 <label for="maxDepth">Hierarchy Depth:</label>
                 <select id="maxDepth">
@@ -82,7 +94,7 @@
                   Controls how many levels deep to fetch in the organization
                 </small>
               </div>
-              
+
               <div class="form-group">
                 <label for="maxUsers">Maximum Users to Fetch:</label>
                 <input type="number" id="maxUsers" value="100" min="10" max="500">
@@ -91,14 +103,14 @@
                 </small>
               </div>
             </div>
-            
+
             <!-- Step 3: License CSV -->
             <div class="wizard-step">
               <h3>
                 <span class="step-number" id="step3Number">3</span>
                 ChatGPT License List (Optional)
               </h3>
-              
+
               <div class="file-upload" id="csvUpload">
                 <input type="file" id="csvFile" accept=".csv">
                 <label class="file-upload-label" for="csvFile">
@@ -106,28 +118,28 @@
                   <small>Format: Single column with 'email' header</small>
                 </label>
               </div>
-              
+
               <div id="csvStatus"></div>
             </div>
-            
+
             <!-- Step 4: Fetch Data -->
             <div class="wizard-step">
               <h3>
                 <span class="step-number" id="step4Number">4</span>
                 Fetch Organization Data
               </h3>
-              
+
               <button class="btn btn-primary" onclick="GraphAPI.fetchOrgData()" id="fetchButton">
                 🔄 Fetch Organization Data
               </button>
-              
+
               <div id="fetchProgress" class="progress-container" style="display: none;">
                 <div class="progress-bar">
                   <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <div class="progress-text" id="progressText">Initializing...</div>
               </div>
-              
+
               <div id="fetchStatus"></div>
             </div>
           </div>
@@ -313,6 +325,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       AppUI.initialize();
       GraphTokenManager.initialize();
+      AppUI.setSectionCollapsed('tokenSection', true);
+      AppUI.setSectionCollapsed('loadSection', true);
       GraphAPI.initialize();
       OrgChart.initialize();
     });
