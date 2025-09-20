@@ -2,6 +2,11 @@
 
 This repository hosts a collection of Microsoft 365 helper utilities that share a unified look and feel. Use the guidelines below when extending the workspace with new tools so that every experience feels cohesive.
 
+## Available Tools & Templates
+- **Organization License Viewer** (`/org-license-viewer`): Visualize reporting lines, highlight ChatGPT license coverage, and explore organizational metrics with collapsible filter panels and chart controls.
+- **Profile Data Appender** (`/user-data-appender`): Upload CSV/Excel files, append Microsoft 365 profile attributes, and export enriched lists with built-in progress and status messaging.
+- **Tool Starter Template** (`/tool-template`): A base layout with Microsoft Graph token handling, collapsible input and settings panels, and a neutral main canvas ready for custom tables, charts, or outputs.
+
 ## Landing Page Layout
 - Cards should be wide rectangles that highlight the tool name, a short description, and structured “Data” and “Features” callouts.
 - Use the existing `tool-card`, `meta-grid`, and `meta-item` classes from `shared/home.css` to keep the layout consistent.
