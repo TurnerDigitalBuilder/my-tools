@@ -3,7 +3,7 @@ const GraphTokenManager = (() => {
   const listeners = new Set();
   const storageAreas = { session: null, local: null };
   let token = '';
-  let textarea = null;
+  let tokenField = null;
   let persist = true;
   let storageMode = 'session';
 
@@ -74,8 +74,8 @@ const GraphTokenManager = (() => {
       writeStoredToken(token, storageMode);
     }
 
-    if (!fromInput && textarea) {
-      textarea.value = token;
+    if (!fromInput && tokenField) {
+      tokenField.value = token;
     }
 
     notifyListeners();
@@ -84,6 +84,7 @@ const GraphTokenManager = (() => {
   return {
     initialize(options = {}) {
       const {
+        inputId,
         textareaId = 'graphToken',
         onTokenChange,
         persistToken = true,
@@ -98,20 +99,21 @@ const GraphTokenManager = (() => {
         listeners.add(onTokenChange);
       }
 
-      textarea = document.getElementById(textareaId);
+      const targetId = inputId || textareaId;
+      tokenField = targetId ? document.getElementById(targetId) : null;
 
       if (restoreFromStorage && persist) {
         const stored = readStoredToken(storageMode);
         if (stored) {
           token = stored;
-          if (textarea) {
-            textarea.value = token;
+          if (tokenField) {
+            tokenField.value = token;
           }
         }
       }
 
-      if (textarea) {
-        textarea.addEventListener('input', event => {
+      if (tokenField) {
+        tokenField.addEventListener('input', event => {
           updateToken(event.target.value, { fromInput: true });
         });
       }
