@@ -21,15 +21,20 @@
         <section class="tool-card">
           <h2>Microsoft Graph Access Token</h2>
           <p>Paste your Microsoft Graph Explorer access token once and reuse it across every tool in this workspace.</p>
-          <div class="help-info">
-            <h4>How to get your access token:</h4>
-            <ol>
-              <li>Open the <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noreferrer">Microsoft Graph Explorer</a>.</li>
-              <li>Sign in with your Microsoft work account.</li>
-              <li>Run any sample query and open the <strong>Access Token</strong> tab.</li>
-              <li>Copy the entire token and paste it below.</li>
-            </ol>
-          </div>
+          
+          <!-- Collapsible help section to save space -->
+          <details class="collapsible-meta">
+            <summary>How to get your access token</summary>
+            <div class="help-info">
+              <ol>
+                <li>Open the <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noreferrer">Microsoft Graph Explorer</a>.</li>
+                <li>Sign in with your Microsoft work account.</li>
+                <li>Run any sample query and open the <strong>Access Token</strong> tab.</li>
+                <li>Copy the entire token and paste it below.</li>
+              </ol>
+            </div>
+          </details>
+          
           <div class="form-group">
             <label for="graphToken">Access Token</label>
             <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
