@@ -40,7 +40,7 @@
 
               <div class="form-group">
                 <label for="graphToken">Access Token:</label>
-                <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
+                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
                 <span class="form-hint" id="detectedDomainHint">Detected sign-in domain: not detected yet.</span>
               </div>
             </div>
@@ -161,7 +161,6 @@
       AppUI.initialize();
       GraphTokenManager.initialize();
       AppUI.setSectionCollapsed('tokenSection', true);
-      AppUI.setSectionCollapsed('loadSection', true);
       DataTable.initialize();
       GraphAPI.initialize();
     });

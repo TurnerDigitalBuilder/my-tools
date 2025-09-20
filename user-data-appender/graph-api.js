@@ -225,9 +225,6 @@ const GraphAPI = (function() {
         DataTable.loadData(columns, filteredRows);
         updateStatus('loadStatus', `${file.name} loaded successfully (${filteredRows.length} rows).`, 'success');
         if (uploadArea) uploadArea.classList.add('has-file');
-        if (typeof AppUI !== 'undefined') {
-          AppUI.setSectionCollapsed('loadSection', true);
-        }
         updateStatus('fetchStatus', '');
         updateDownloadButtons();
         updateFetchButtonState();
@@ -265,9 +262,6 @@ const GraphAPI = (function() {
     updateStatus('loadStatus', `Loaded ${rows.length} email${rows.length === 1 ? '' : 's'} from pasted list.`, 'success');
     const uploadArea = document.getElementById('fileUploadArea');
     if (uploadArea) uploadArea.classList.remove('has-file');
-    if (typeof AppUI !== 'undefined') {
-      AppUI.setSectionCollapsed('loadSection', true);
-    }
     updateStatus('fetchStatus', '');
     updateDownloadButtons();
     updateFetchButtonState();

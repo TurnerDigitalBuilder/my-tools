@@ -47,7 +47,7 @@
 
               <div class="form-group">
                 <label for="graphToken">Access Token:</label>
-                <textarea id="graphToken" placeholder="Paste your Microsoft Graph access token here..."></textarea>
+                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
               </div>
             </div>
           </div>
@@ -326,7 +326,6 @@
       AppUI.initialize();
       GraphTokenManager.initialize();
       AppUI.setSectionCollapsed('tokenSection', true);
-      AppUI.setSectionCollapsed('loadSection', true);
       GraphAPI.initialize();
       OrgChart.initialize();
     });
