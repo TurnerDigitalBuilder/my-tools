@@ -93,20 +93,12 @@ const ColumnComparer = (() => {
     elements.compareButton?.addEventListener('click', () => runComparison());
   }
 
-  function updateTokenStatus(token) {
+  function handleTokenChange(token) {
     if (!elements.tokenStatus) {
       return;
     }
 
-    if (!token) {
-      elements.tokenStatus.textContent = 'No token stored yet.';
-      return;
-    }
-
-    const start = token.slice(0, 12);
-    const end = token.slice(-6);
-    const preview = token.length > 18 ? `${start}…${end}` : token;
-    elements.tokenStatus.textContent = `Token stored (${token.length} characters, preview: ${preview}).`;
+    AppUI.updateTokenStatus(elements.tokenStatus, token, { start: 12, end: 6 });
   }
 
   function invalidateResults(message) {
@@ -712,7 +704,7 @@ const ColumnComparer = (() => {
       if (elements.columnSelects.B) {
         resetColumnSelect(elements.columnSelects.B, 'B');
       }
-      GraphTokenManager.subscribe(updateTokenStatus);
+      GraphTokenManager.initialize({ onTokenChange: handleTokenChange });
     }
   };
 })();

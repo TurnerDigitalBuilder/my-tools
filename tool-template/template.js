@@ -1,17 +1,6 @@
 const TemplateApp = (() => {
-  function updateTokenStatus(token) {
-    const status = document.getElementById('tokenStatus');
-    if (!status) {
-      return;
-    }
-
-    if (!token) {
-      status.textContent = 'No token stored yet.';
-      return;
-    }
-
-    const preview = `${token.slice(0, 12)}…${token.slice(-6)}`;
-    status.textContent = `Token stored (${token.length} characters, preview: ${preview}).`;
+  function handleTokenChange(token) {
+    AppUI.updateTokenStatus('tokenStatus', token, { start: 12, end: 6 });
   }
 
   function formatSettingsSummary() {
@@ -101,7 +90,7 @@ const TemplateApp = (() => {
 
   function initialize() {
     AppUI.initialize();
-    GraphTokenManager.initialize({ onTokenChange: updateTokenStatus });
+    GraphTokenManager.initialize({ onTokenChange: handleTokenChange });
     collapseDefaults();
     bindEvents();
 

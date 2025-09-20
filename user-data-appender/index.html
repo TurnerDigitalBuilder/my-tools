@@ -41,7 +41,8 @@
               <div class="form-group">
                 <label for="graphToken">Access Token:</label>
                 <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
-                <span class="form-hint" id="detectedDomainHint">Detected sign-in domain: not detected yet.</span>
+                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
+                <small class="form-hint" id="detectedDomainHint">Detected sign-in domain: not detected yet.</small>
               </div>
             </div>
           </div>
@@ -159,7 +160,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       AppUI.initialize();
-      GraphTokenManager.initialize();
       AppUI.setSectionCollapsed('tokenSection', true);
       DataTable.initialize();
       GraphAPI.initialize();
