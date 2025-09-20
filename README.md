@@ -5,7 +5,7 @@ This repository hosts a suite of Microsoft 365 helper utilities that intentional
 ## Available Tools & Templates
 - **Organization License Viewer** (`/org-license-viewer`): Visualize reporting lines, highlight ChatGPT license coverage, and explore team metrics with collapsible chart controls.
 - **Profile Data Appender** (`/user-data-appender`): Upload CSV/Excel files, append Microsoft 365 profile attributes, and export enriched lists with progress and status messaging.
-- **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to surface overlaps, gaps, and duplicates with configurable matching rules.
+- **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to surface overlaps, gaps, and duplicates with configurable matching rules. This tool is fully offline and intentionally omits the Microsoft Graph token panel.
 - **Tool Starter Template** (`/tool-template`): A baseline layout with Microsoft Graph token handling, collapsible input/settings panels, and a neutral main canvas ready for custom visualizations.
 
 ## Shared Design System
@@ -15,10 +15,10 @@ This repository hosts a suite of Microsoft 365 helper utilities that intentional
 - The left panel is fixed at 380px wide, scrolls independently, and should keep its structure lightweight so the main canvas remains the visual focus.
 
 ### Setup Panel Standards
-1. **Microsoft Graph Token** (collapsed on load)
-   - Include an input with `id="graphToken"` and a hint element with `id="tokenStatus"`.
-   - Call `GraphTokenManager.initialize({ onTokenChange: token => AppUI.updateTokenStatus('tokenStatus', token) });` inside your tool script so the status automatically reflects stored tokens.
-   - Collapse the section on page load with `AppUI.setSectionCollapsed('tokenSection', true);`.
+1. **Microsoft Graph Token** (only include when the tool makes Graph requests)
+   - Tools that do not need Microsoft Graph should skip the token panel entirely to keep the setup area focused on required inputs.
+   - When a tool does rely on Graph, include an input with `id="graphToken"`, a hint element with `id="tokenStatus"`, and call `GraphTokenManager.initialize({ onTokenChange: token => AppUI.updateTokenStatus('tokenStatus', token) });` inside your tool script.
+   - Collapse the token section on page load with `AppUI.setSectionCollapsed('tokenSection', true);` so it stays out of the way after configuration.
 2. **Load Data / Inputs** (collapsed on load)
    - Pair file pickers, textarea inputs, or API triggers with contextual helper text.
    - After a successful load, call `AppUI.setSectionCollapsed('loadSection', true);` so users can focus on downstream controls.
@@ -40,8 +40,8 @@ This repository hosts a suite of Microsoft 365 helper utilities that intentional
 Light and dark themes automatically remap those variables, so leaning on the shared tokens keeps every tool visually aligned and accessible.
 
 ## Microsoft Graph Token Workflow
-- Always bootstrap token handling inside your tool script (not from inline HTML) using `GraphTokenManager.initialize`.
-- Update all dependent controls inside the `onTokenChange` callback. Most tools should:
+- For tools that call Microsoft Graph, bootstrap token handling inside your tool script (not from inline HTML) using `GraphTokenManager.initialize`.
+- Update all dependent controls inside the `onTokenChange` callback. Graph-enabled tools should:
   - Call `AppUI.updateTokenStatus` to refresh the hint under the token input.
   - Store the trimmed token in module state for validation and API calls.
   - Trigger any derived UI (e.g., detected tenant domain, enabled/disabled buttons).
@@ -51,10 +51,11 @@ Light and dark themes automatically remap those variables, so leaning on the sha
 - Tool cards live on `/index.html` and use the shared `tool-card`, `meta-grid`, and `meta-item` classes from `shared/home.css`.
 - Each card lists the tool name, a concise description, “Data” and “Features” callouts, and a primary button that opens the tool.
 - The landing page token card is the single place to seed the shared Microsoft Graph token—new tools should rely on that same storage.
+- If a new tool does not require Graph data, do not surface an extra token panel; the landing page storage is enough for other tools that need it.
 
 ## Template as a Starting Point
 The `/tool-template` folder demonstrates the preferred wiring:
-- Collapsible token, input, and settings panels that already call `GraphTokenManager.initialize` and `AppUI.updateTokenStatus`.
+- Collapsible token, input, and settings panels that already call `GraphTokenManager.initialize` and `AppUI.updateTokenStatus` when your feature needs Graph.
 - Sample controls, toggle rows, and status messaging patterns ready to swap for real logic.
 - A neutral `.template-state` section that makes it easy to drop in charts, tables, or cards.
 Start new tools by copying this folder and replacing the placeholder logic while keeping the structure intact.

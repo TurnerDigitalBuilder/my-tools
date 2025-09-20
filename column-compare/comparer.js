@@ -52,7 +52,6 @@ const ColumnComparer = (() => {
       duplicatesA: document.getElementById('duplicatesAEmpty'),
       duplicatesB: document.getElementById('duplicatesBEmpty')
     };
-    elements.tokenStatus = document.getElementById('tokenStatus');
   }
 
   function attachEventListeners() {
@@ -91,14 +90,6 @@ const ColumnComparer = (() => {
     });
 
     elements.compareButton?.addEventListener('click', () => runComparison());
-  }
-
-  function handleTokenChange(token) {
-    if (!elements.tokenStatus) {
-      return;
-    }
-
-    AppUI.updateTokenStatus(elements.tokenStatus, token, { start: 12, end: 6 });
   }
 
   function invalidateResults(message) {
@@ -704,7 +695,6 @@ const ColumnComparer = (() => {
       if (elements.columnSelects.B) {
         resetColumnSelect(elements.columnSelects.B, 'B');
       }
-      GraphTokenManager.initialize({ onTokenChange: handleTokenChange });
     }
   };
 })();
