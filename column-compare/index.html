@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Column Comparison Tool</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>Column Comparison Tool</h1>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="setup-panel" id="setupPanel">
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
+            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
+            <h3 style="margin: 0;">Microsoft Graph Token</h3>
+          </div>
+
+          <div class="collapsible-content" id="tokenSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">1</span>
+                Optional: Store Your Graph Token
+              </h3>
+              <p class="helper-text">
+                Paste a Microsoft Graph Explorer access token to reuse it across every tool. This comparison utility does not
+                call Graph, but the shared token storage keeps your workspace in sync.
+              </p>
+              <div class="form-group">
+                <label for="graphToken">Access Token:</label>
+                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
+                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
+            <span class="collapse-icon" id="loadSectionIcon">▼</span>
+            <h3 style="margin: 0;">Load Datasets</h3>
+          </div>
+
+          <div class="collapsible-content" id="loadSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">2</span>
+                Upload CSV or Excel Files
+              </h3>
+              <p class="helper-text">Choose one file for each dataset. The first row should contain column headers.</p>
+
+              <div class="dataset-upload" data-dataset="A">
+                <h4>Dataset A</h4>
+                <div class="file-upload">
+                  <input type="file" id="datasetAFile" accept=".csv,.xlsx,.xls">
+                  <label class="file-upload-label" for="datasetAFile">
+                    📁 Upload Dataset A<br>
+                    <small>Accepts CSV, XLSX, or XLS.</small>
+                  </label>
+                </div>
+                <div class="dataset-summary" id="datasetASummary">No file selected yet.</div>
+                <div class="status-message" id="datasetAStatus" role="status" aria-live="polite"></div>
+              </div>
+
+              <div class="dataset-upload" data-dataset="B">
+                <h4>Dataset B</h4>
+                <div class="file-upload">
+                  <input type="file" id="datasetBFile" accept=".csv,.xlsx,.xls">
+                  <label class="file-upload-label" for="datasetBFile">
+                    📁 Upload Dataset B<br>
+                    <small>Accepts CSV, XLSX, or XLS.</small>
+                  </label>
+                </div>
+                <div class="dataset-summary" id="datasetBSummary">No file selected yet.</div>
+                <div class="status-message" id="datasetBStatus" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('selectionSection')">
+            <span class="collapse-icon" id="selectionSectionIcon">▼</span>
+            <h3 style="margin: 0;">Select Columns &amp; Options</h3>
+          </div>
+
+          <div class="collapsible-content" id="selectionSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">3</span>
+                Choose Columns to Compare
+              </h3>
+              <p class="helper-text">Columns populate after each dataset loads. Only non-empty values are considered when the blank filter is enabled.</p>
+
+              <div class="form-group">
+                <label for="columnSelectA">Column from Dataset A</label>
+                <select id="columnSelectA" disabled>
+                  <option value="">Load Dataset A to choose a column</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="columnSelectB">Column from Dataset B</label>
+                <select id="columnSelectB" disabled>
+                  <option value="">Load Dataset B to choose a column</option>
+                </select>
+              </div>
+
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="ignoreCaseToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Ignore Letter Case</div>
+                  <small class="form-hint">Treat values such as "Alice" and "alice" as matches.</small>
+                </div>
+              </div>
+
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="trimToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Trim Whitespace</div>
+                  <small class="form-hint">Remove leading/trailing spaces before comparing values.</small>
+                </div>
+              </div>
+
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="skipBlankToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Skip Blank Values</div>
+                  <small class="form-hint">Ignore rows where the chosen column is empty.</small>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="compareButton" disabled>Run Comparison</button>
+              <div class="status-message" id="comparisonStatus" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="viz-container">
+        <section class="intro-state" id="introState">
+          <h2>Compare Unique Values Between Files</h2>
+          <p>
+            Upload two spreadsheets, choose the columns to inspect, and instantly see which values exist in both tables or are
+            missing from one. Use the toggles to control case sensitivity, whitespace handling, and whether blank cells should
+            be ignored.
+          </p>
+          <ul>
+            <li>The overview cards summarize the number of unique values and overlaps.</li>
+            <li>Tables below break down matches, items only in Dataset A, items only in Dataset B, and duplicates within each file.</li>
+            <li>Download-ready exports will be added in future iterations if needed.</li>
+          </ul>
+        </section>
+
+        <section class="comparison-overview" id="overviewSection" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Comparison Overview</h2>
+              <p id="overviewDescription" class="section-description"></p>
+            </div>
+            <div class="column-pill" id="selectedColumns"></div>
+          </div>
+          <div class="summary-grid" id="summaryGrid"></div>
+        </section>
+
+        <section class="results-section" id="matchesSection" hidden>
+          <div class="section-header">
+            <div>
+              <h3>Values Present in Both Files</h3>
+              <p class="section-description">Matched values show how frequently they appear in each dataset.</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th scope="col">Value</th>
+                  <th scope="col">Occurrences in A</th>
+                  <th scope="col">Occurrences in B</th>
+                </tr>
+              </thead>
+              <tbody id="matchesTableBody"></tbody>
+            </table>
+            <div class="table-empty" id="matchesEmpty">No overlapping values detected.</div>
+          </div>
+        </section>
+
+        <section class="results-section" id="onlyASection" hidden>
+          <div class="section-header">
+            <div>
+              <h3>Only in Dataset A</h3>
+              <p class="section-description">Values that do not appear in the selected column from Dataset B.</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th scope="col">Value</th>
+                  <th scope="col">Occurrences</th>
+                </tr>
+              </thead>
+              <tbody id="onlyATableBody"></tbody>
+            </table>
+            <div class="table-empty" id="onlyAEmpty">Every value from Dataset A was also present in Dataset B.</div>
+          </div>
+        </section>
+
+        <section class="results-section" id="onlyBSection" hidden>
+          <div class="section-header">
+            <div>
+              <h3>Only in Dataset B</h3>
+              <p class="section-description">Values that do not appear in the selected column from Dataset A.</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th scope="col">Value</th>
+                  <th scope="col">Occurrences</th>
+                </tr>
+              </thead>
+              <tbody id="onlyBTableBody"></tbody>
+            </table>
+            <div class="table-empty" id="onlyBEmpty">Every value from Dataset B was also present in Dataset A.</div>
+          </div>
+        </section>
+
+        <section class="results-section" id="duplicatesSection" hidden>
+          <div class="section-header">
+            <div>
+              <h3>Duplicate Values Within Each Dataset</h3>
+              <p class="section-description">These values appear more than once in the selected column of a file.</p>
+            </div>
+          </div>
+          <div class="duplicate-grid">
+            <div>
+              <h4>Dataset A</h4>
+              <div class="table-wrapper">
+                <table class="results-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Value</th>
+                      <th scope="col">Occurrences</th>
+                    </tr>
+                  </thead>
+                  <tbody id="duplicatesATableBody"></tbody>
+                </table>
+                <div class="table-empty" id="duplicatesAEmpty">No duplicates found in Dataset A.</div>
+              </div>
+            </div>
+            <div>
+              <h4>Dataset B</h4>
+              <div class="table-wrapper">
+                <table class="results-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Value</th>
+                      <th scope="col">Occurrences</th>
+                    </tr>
+                  </thead>
+                  <tbody id="duplicatesBTableBody"></tbody>
+                </table>
+                <div class="table-empty" id="duplicatesBEmpty">No duplicates found in Dataset B.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/graph-token.js"></script>
+  <script src="comparer.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AppUI.initialize();
+      GraphTokenManager.initialize();
+      AppUI.setSectionCollapsed('tokenSection', true);
+      ColumnComparer.initialize();
+    });
+  </script>
+</body>
+</html>

@@ -5,6 +5,7 @@ This repository hosts a collection of Microsoft 365 helper utilities that share 
 ## Available Tools & Templates
 - **Organization License Viewer** (`/org-license-viewer`): Visualize reporting lines, highlight ChatGPT license coverage, and explore organizational metrics with collapsible filter panels and chart controls.
 - **Profile Data Appender** (`/user-data-appender`): Upload CSV/Excel files, append Microsoft 365 profile attributes, and export enriched lists with built-in progress and status messaging.
+- **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to highlight shared values, gaps, and duplicates with configurable matching rules.
 - **Tool Starter Template** (`/tool-template`): A base layout with Microsoft Graph token handling, collapsible input and settings panels, and a neutral main canvas ready for custom tables, charts, or outputs.
 
 ## Landing Page Layout
