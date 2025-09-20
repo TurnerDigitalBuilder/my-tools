@@ -19,11 +19,20 @@ const GraphAPI = (function() {
   // API configuration
   const graphBaseUrl = 'https://graph.microsoft.com/v1.0';
   const orgDomain = 'tcco.com';
-  
+
+  function handleTokenChange(token) {
+    accessToken = (token || '').trim();
+    AppUI.updateTokenStatus('tokenStatus', accessToken, { start: 12, end: 6 });
+  }
+
   // Public API
   return {
     // Initialize the module
     initialize: function() {
+      if (typeof GraphTokenManager !== 'undefined') {
+        GraphTokenManager.initialize({ onTokenChange: handleTokenChange });
+      }
+
       // Set up event listeners for CSV upload
       const csvInput = document.getElementById('csvFile');
       if (csvInput) {
@@ -326,10 +335,15 @@ const GraphAPI = (function() {
     
     // Fetch organization data
     fetchOrgData: async function() {
+      if (!accessToken && typeof GraphTokenManager !== 'undefined') {
+        const storedToken = GraphTokenManager.getToken();
+        accessToken = storedToken ? storedToken.trim() : '';
+        if (accessToken) {
+          handleTokenChange(accessToken);
+        }
+      }
+
       // Get input values
-      accessToken = typeof GraphTokenManager !== 'undefined'
-        ? GraphTokenManager.getToken()
-        : '';
       startingEmail = document.getElementById('startingEmail').value.trim();
       maxUsers = parseInt(document.getElementById('maxUsers').value) || 100;
       const maxDepth = parseInt(document.getElementById('maxDepth').value) || 4;
@@ -420,12 +434,7 @@ const GraphAPI = (function() {
         `;
         
         // Auto-collapse the load section
-        const loadSection = document.getElementById('loadSection');
-        const loadSectionIcon = document.getElementById('loadSectionIcon');
-        if (loadSection && loadSectionIcon) {
-          loadSection.style.display = 'none';
-          loadSectionIcon.textContent = '▶';
-        }
+        AppUI.setSectionCollapsed('loadSection', true);
         
         // Show statistics
         this.showStatistics();

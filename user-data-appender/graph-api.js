@@ -72,6 +72,14 @@ const GraphAPI = (function() {
     }
   }
 
+  function handleTokenChange(token) {
+    accessToken = (token || '').trim();
+    loginDomain = accessToken ? extractDomainFromToken(accessToken) : '';
+    AppUI.updateTokenStatus('tokenStatus', accessToken, { start: 12, end: 6 });
+    updateDetectedDomainHint();
+    updateFetchButtonState();
+  }
+
   function buildLookupContext(emailValue) {
     const rawEmail = typeof emailValue === 'string' ? emailValue : '';
     const normalizedEmail = rawEmail.trim();
@@ -228,6 +236,7 @@ const GraphAPI = (function() {
         updateStatus('fetchStatus', '');
         updateDownloadButtons();
         updateFetchButtonState();
+        AppUI.setSectionCollapsed('loadSection', true);
       })
       .catch(error => {
         console.error('Error loading file:', error);
@@ -265,6 +274,7 @@ const GraphAPI = (function() {
     updateStatus('fetchStatus', '');
     updateDownloadButtons();
     updateFetchButtonState();
+    AppUI.setSectionCollapsed('loadSection', true);
   }
 
   function updateAppendModeUI() {
@@ -564,12 +574,7 @@ const GraphAPI = (function() {
   return {
     initialize: function() {
       if (typeof GraphTokenManager !== 'undefined') {
-        GraphTokenManager.subscribe(value => {
-          accessToken = value.trim();
-          loginDomain = accessToken ? extractDomainFromToken(accessToken) : '';
-          updateDetectedDomainHint();
-          updateFetchButtonState();
-        });
+        GraphTokenManager.initialize({ onTokenChange: handleTokenChange });
       }
 
       attachEventListeners();

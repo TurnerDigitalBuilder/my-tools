@@ -17,6 +17,16 @@
   --transition: all 0.3s ease;
   --node-stroke: #3498db;
   --link-color: #ccc;
+  --surface: var(--bg);
+  --surface-alt: #eef2f7;
+  --surface-elevated: #ffffff;
+  --text-strong: var(--text);
+  --text-subtle: var(--text-light);
+  --accent-muted: rgba(0, 102, 204, 0.12);
+  --accent-strong: var(--primary);
+  --border-subtle: rgba(44, 62, 80, 0.15);
+  --shadow-sm: 0 6px 12px rgba(15, 23, 42, 0.1);
+  --shadow-xs: 0 2px 4px rgba(15, 23, 42, 0.08);
 }
 
 .dark-mode {
@@ -33,6 +43,16 @@
   --border: #404040;
   --node-stroke: #69c0ff;
   --link-color: #555;
+  --surface: var(--bg-secondary);
+  --surface-alt: #242424;
+  --surface-elevated: #2f2f2f;
+  --text-strong: var(--text);
+  --text-subtle: var(--text-light);
+  --accent-muted: rgba(77, 166, 255, 0.18);
+  --accent-strong: var(--primary);
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --shadow-sm: 0 6px 12px rgba(0, 0, 0, 0.4);
+  --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 *, *::before, *::after {
@@ -83,6 +103,14 @@ body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.viz-container {
+  flex: 1;
+  min-height: 0;
+  padding: 2rem;
+  background: var(--bg);
+  overflow-y: auto;
 }
 
 /* Setup Panel */

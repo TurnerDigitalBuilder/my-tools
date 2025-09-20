@@ -48,6 +48,7 @@
               <div class="form-group">
                 <label for="graphToken">Access Token:</label>
                 <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
+                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
               </div>
             </div>
           </div>
@@ -324,7 +325,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       AppUI.initialize();
-      GraphTokenManager.initialize();
       AppUI.setSectionCollapsed('tokenSection', true);
       GraphAPI.initialize();
       OrgChart.initialize();

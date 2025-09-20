@@ -52,6 +52,34 @@ const AppUI = (() => {
     }
   }
 
+  function resolveElement(target) {
+    if (!target) {
+      return null;
+    }
+
+    if (typeof target === 'string') {
+      return document.getElementById(target);
+    }
+
+    if (target instanceof HTMLElement) {
+      return target;
+    }
+
+    return null;
+  }
+
+  function formatTokenPreview(token, { start = 12, end = 6 } = {}) {
+    if (typeof token !== 'string' || !token.length) {
+      return '';
+    }
+
+    if (token.length <= start + end + 1) {
+      return token;
+    }
+
+    return `${token.slice(0, start)}…${token.slice(-end)}`;
+  }
+
   return {
     initialize(options = {}) {
       const { defaultTheme = 'light', rememberTheme = true } = options;
@@ -101,6 +129,28 @@ const AppUI = (() => {
         section.style.display = 'block';
         icon.textContent = '▼';
       }
+    },
+
+    updateTokenStatus(target, token, options = {}) {
+      const element = resolveElement(target);
+      if (!element) {
+        return;
+      }
+
+      const {
+        emptyMessage = 'No token stored yet.',
+        prefix = 'Token stored',
+        start = 12,
+        end = 6
+      } = options;
+
+      if (!token) {
+        element.textContent = emptyMessage;
+        return;
+      }
+
+      const preview = formatTokenPreview(token, { start, end });
+      element.textContent = `${prefix} (${token.length} characters, preview: ${preview}).`;
     }
   };
 })();
