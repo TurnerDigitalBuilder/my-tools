@@ -141,7 +141,7 @@
           <ul>
             <li>The overview cards summarize the number of unique values and overlaps.</li>
             <li>Tables below break down matches, items only in Dataset A, items only in Dataset B, and duplicates within each file.</li>
-            <li>Download-ready exports will be added in future iterations if needed.</li>
+            <li>Use the export controls in each section to download filtered CSV or Excel files for the rows you care about.</li>
           </ul>
         </section>
 
@@ -162,6 +162,20 @@
               <h3>Values Present in Both Files</h3>
               <p class="section-description">Matched values show how frequently they appear in each dataset.</p>
             </div>
+          </div>
+          <div class="export-controls" id="matchesExportControls">
+            <div class="control-group">
+              <label for="matchesDatasetSelect">Source file</label>
+              <select id="matchesDatasetSelect"></select>
+            </div>
+            <div class="control-group">
+              <label for="matchesFormatSelect">Download as</label>
+              <select id="matchesFormatSelect">
+                <option value="csv">CSV (.csv)</option>
+                <option value="xlsx">Excel Workbook (.xlsx)</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="downloadMatchesButton" disabled>Download Filtered Rows</button>
           </div>
           <div class="table-wrapper">
             <table class="results-table">
@@ -185,6 +199,16 @@
               <p class="section-description">Values that do not appear in the selected column from Dataset B.</p>
             </div>
           </div>
+          <div class="export-controls" id="onlyAExportControls">
+            <div class="control-group">
+              <label for="onlyAFormatSelect">Download as</label>
+              <select id="onlyAFormatSelect">
+                <option value="csv">CSV (.csv)</option>
+                <option value="xlsx">Excel Workbook (.xlsx)</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="downloadOnlyAButton" disabled>Download Unique Rows</button>
+          </div>
           <div class="table-wrapper">
             <table class="results-table">
               <thead>
@@ -205,6 +229,16 @@
               <h3>Only in Dataset B</h3>
               <p class="section-description">Values that do not appear in the selected column from Dataset A.</p>
             </div>
+          </div>
+          <div class="export-controls" id="onlyBExportControls">
+            <div class="control-group">
+              <label for="onlyBFormatSelect">Download as</label>
+              <select id="onlyBFormatSelect">
+                <option value="csv">CSV (.csv)</option>
+                <option value="xlsx">Excel Workbook (.xlsx)</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="downloadOnlyBButton" disabled>Download Unique Rows</button>
           </div>
           <div class="table-wrapper">
             <table class="results-table">

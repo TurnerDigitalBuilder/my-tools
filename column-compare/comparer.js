@@ -2,7 +2,13 @@ const ColumnComparer = (() => {
   const state = {
     datasets: { A: null, B: null },
     selections: { A: '', B: '' },
-    results: null
+    results: null,
+    exportPreferences: {
+      matchesDataset: 'A',
+      matchesFormat: 'csv',
+      onlyAFormat: 'csv',
+      onlyBFormat: 'csv'
+    }
   };
 
   const elements = {};
@@ -52,6 +58,24 @@ const ColumnComparer = (() => {
       duplicatesA: document.getElementById('duplicatesAEmpty'),
       duplicatesB: document.getElementById('duplicatesBEmpty')
     };
+    elements.exportControls = {
+      matches: {
+        container: document.getElementById('matchesExportControls'),
+        datasetSelect: document.getElementById('matchesDatasetSelect'),
+        formatSelect: document.getElementById('matchesFormatSelect'),
+        button: document.getElementById('downloadMatchesButton')
+      },
+      onlyA: {
+        container: document.getElementById('onlyAExportControls'),
+        formatSelect: document.getElementById('onlyAFormatSelect'),
+        button: document.getElementById('downloadOnlyAButton')
+      },
+      onlyB: {
+        container: document.getElementById('onlyBExportControls'),
+        formatSelect: document.getElementById('onlyBFormatSelect'),
+        button: document.getElementById('downloadOnlyBButton')
+      }
+    };
   }
 
   function attachEventListeners() {
@@ -90,6 +114,29 @@ const ColumnComparer = (() => {
     });
 
     elements.compareButton?.addEventListener('click', () => runComparison());
+
+    elements.exportControls.matches.datasetSelect?.addEventListener('change', event => {
+      state.exportPreferences.matchesDataset = event.target.value;
+      updateExportControls();
+    });
+
+    elements.exportControls.matches.formatSelect?.addEventListener('change', event => {
+      state.exportPreferences.matchesFormat = event.target.value;
+    });
+
+    elements.exportControls.matches.button?.addEventListener('click', () => downloadMatches());
+
+    elements.exportControls.onlyA.formatSelect?.addEventListener('change', event => {
+      state.exportPreferences.onlyAFormat = event.target.value;
+    });
+
+    elements.exportControls.onlyA.button?.addEventListener('click', () => downloadOnly('A'));
+
+    elements.exportControls.onlyB.formatSelect?.addEventListener('change', event => {
+      state.exportPreferences.onlyBFormat = event.target.value;
+    });
+
+    elements.exportControls.onlyB.button?.addEventListener('click', () => downloadOnly('B'));
   }
 
   function invalidateResults(message) {
@@ -106,6 +153,8 @@ const ColumnComparer = (() => {
     if (elements.introState) {
       elements.introState.style.display = '';
     }
+
+    updateExportControls();
   }
 
   function setStatus(element, message, type = 'info') {
@@ -177,6 +226,7 @@ const ColumnComparer = (() => {
       setStatus(statusEl, `Unable to load file: ${error.message || 'Unknown error'}`, 'error');
     } finally {
       updateCompareButtonState();
+      updateExportControls();
     }
   }
 
@@ -282,11 +332,13 @@ const ColumnComparer = (() => {
         map.set(normalized.normalized, {
           key: normalized.normalized,
           display: normalized.display,
-          count: 1
+          count: 1,
+          rows: [row]
         });
       } else {
         const entry = map.get(normalized.normalized);
         entry.count += 1;
+        entry.rows.push(row);
         if (!entry.display && normalized.display) {
           entry.display = normalized.display;
         }
@@ -384,8 +436,243 @@ const ColumnComparer = (() => {
         onlyB: onlyInB.length,
         duplicatesA: duplicatesA.length,
         duplicatesB: duplicatesB.length
+      },
+      valueMaps: {
+        A: valuesA.map,
+        B: valuesB.map
       }
     };
+  }
+
+  function populateMatchesDatasetOptions() {
+    const controls = elements.exportControls?.matches;
+    const select = controls?.datasetSelect;
+    if (!select) {
+      return;
+    }
+
+    const previousSelection = state.exportPreferences.matchesDataset;
+    select.innerHTML = '';
+
+    const options = [];
+    ['A', 'B'].forEach(key => {
+      const dataset = state.datasets[key];
+      if (dataset) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = dataset.fileName ? `Dataset ${key} • ${dataset.fileName}` : `Dataset ${key}`;
+        options.push(option);
+      }
+    });
+
+    if (!options.length) {
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Load datasets to enable downloads';
+      select.appendChild(placeholder);
+      select.value = '';
+      select.disabled = true;
+      return;
+    }
+
+    options.forEach(option => select.appendChild(option));
+
+    const availableValues = options.map(option => option.value);
+    const selection = availableValues.includes(previousSelection) ? previousSelection : options[0].value;
+    select.value = selection;
+    state.exportPreferences.matchesDataset = selection;
+    select.disabled = false;
+  }
+
+  function updateExportControls() {
+    populateMatchesDatasetOptions();
+
+    const controls = elements.exportControls;
+    if (!controls) {
+      return;
+    }
+
+    if (controls.matches?.formatSelect) {
+      controls.matches.formatSelect.value = state.exportPreferences.matchesFormat;
+    }
+    if (controls.onlyA?.formatSelect) {
+      controls.onlyA.formatSelect.value = state.exportPreferences.onlyAFormat;
+    }
+    if (controls.onlyB?.formatSelect) {
+      controls.onlyB.formatSelect.value = state.exportPreferences.onlyBFormat;
+    }
+
+    const resultsAvailable = Boolean(state.results);
+    const hasMatches = resultsAvailable && state.results.matches.length > 0;
+    const matchesDataset = state.exportPreferences.matchesDataset;
+    const matchesDatasetLoaded = Boolean(matchesDataset && state.datasets[matchesDataset]);
+
+    if (controls.matches) {
+      if (controls.matches.datasetSelect) {
+        const hasAnyDataset = Boolean(state.datasets.A || state.datasets.B);
+        controls.matches.datasetSelect.disabled = !hasAnyDataset;
+      }
+      if (controls.matches.formatSelect) {
+        controls.matches.formatSelect.disabled = !(hasMatches && matchesDatasetLoaded);
+      }
+      if (controls.matches.button) {
+        controls.matches.button.disabled = !(hasMatches && matchesDatasetLoaded);
+      }
+    }
+
+    const hasOnlyA = resultsAvailable && state.results.onlyInA.length > 0;
+    if (controls.onlyA) {
+      if (controls.onlyA.formatSelect) {
+        controls.onlyA.formatSelect.disabled = !hasOnlyA;
+      }
+      if (controls.onlyA.button) {
+        controls.onlyA.button.disabled = !hasOnlyA;
+      }
+    }
+
+    const hasOnlyB = resultsAvailable && state.results.onlyInB.length > 0;
+    if (controls.onlyB) {
+      if (controls.onlyB.formatSelect) {
+        controls.onlyB.formatSelect.disabled = !hasOnlyB;
+      }
+      if (controls.onlyB.button) {
+        controls.onlyB.button.disabled = !hasOnlyB;
+      }
+    }
+  }
+
+  function gatherRowsForKeys(datasetKey, keys) {
+    if (!state.results?.valueMaps) {
+      return [];
+    }
+
+    const map = state.results.valueMaps[datasetKey];
+    if (!map) {
+      return [];
+    }
+
+    const rows = [];
+    keys.forEach(key => {
+      const entry = map.get(key);
+      if (entry?.rows?.length) {
+        rows.push(...entry.rows);
+      }
+    });
+    return rows;
+  }
+
+  function getDatasetColumns(datasetKey) {
+    return state.datasets[datasetKey]?.columns || [];
+  }
+
+  function getDatasetFileName(datasetKey) {
+    const dataset = state.datasets[datasetKey];
+    return dataset?.fileName || `dataset-${datasetKey}`;
+  }
+
+  function getFileBaseName(fileName) {
+    const lastDot = fileName.lastIndexOf('.');
+    return lastDot === -1 ? fileName : fileName.slice(0, lastDot);
+  }
+
+  function buildExportFileName(datasetKey, suffix, format) {
+    const baseName = getFileBaseName(getDatasetFileName(datasetKey));
+    const extension = format === 'xlsx' ? 'xlsx' : 'csv';
+    return `${baseName}__${suffix}.${extension}`;
+  }
+
+  function downloadCsv(columns, rows, fileName) {
+    const dataRows = rows.map(row => columns.map(column => row[column] ?? ''));
+    const csv = Papa.unparse({ fields: columns, data: dataRows });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    triggerDownload(blob, fileName);
+  }
+
+  function downloadXlsx(columns, rows, fileName) {
+    const header = [columns];
+    const dataRows = rows.map(row => columns.map(column => row[column] ?? ''));
+    const worksheet = XLSX.utils.aoa_to_sheet([...header, ...dataRows]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered');
+    const arrayBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    triggerDownload(blob, fileName);
+  }
+
+  function triggerDownload(blob, fileName) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function downloadMatches() {
+    if (!state.results) {
+      setStatus(elements.comparisonStatus, 'Run a comparison to generate downloadable results.', 'warning');
+      return;
+    }
+
+    const datasetKey = state.exportPreferences.matchesDataset;
+    if (!datasetKey || !state.datasets[datasetKey]) {
+      setStatus(elements.comparisonStatus, 'Select a source file to download matches from.', 'warning');
+      return;
+    }
+
+    if (!state.results.matches.length) {
+      setStatus(elements.comparisonStatus, 'No overlapping values are available to export.', 'info');
+      return;
+    }
+
+    const rows = gatherRowsForKeys(datasetKey, state.results.matches.map(item => item.sortKey));
+    if (!rows.length) {
+      setStatus(elements.comparisonStatus, 'No matching rows were found when preparing the download.', 'info');
+      return;
+    }
+
+    const columns = getDatasetColumns(datasetKey);
+    const fileName = buildExportFileName(datasetKey, 'values-in-both', state.exportPreferences.matchesFormat);
+    if (state.exportPreferences.matchesFormat === 'xlsx') {
+      downloadXlsx(columns, rows, fileName);
+    } else {
+      downloadCsv(columns, rows, fileName);
+    }
+    setStatus(elements.comparisonStatus, 'Download generated. Check your browser downloads for the filtered matches file.', 'success');
+  }
+
+  function downloadOnly(datasetKey) {
+    if (!state.results) {
+      setStatus(elements.comparisonStatus, 'Run a comparison to generate downloadable results.', 'warning');
+      return;
+    }
+
+    const resultKey = datasetKey === 'A' ? 'onlyInA' : 'onlyInB';
+    const suffix = datasetKey === 'A' ? 'only-in-dataset-a' : 'only-in-dataset-b';
+    const format = datasetKey === 'A' ? state.exportPreferences.onlyAFormat : state.exportPreferences.onlyBFormat;
+    const entries = state.results[resultKey] || [];
+
+    if (!entries.length) {
+      setStatus(elements.comparisonStatus, `No values unique to Dataset ${datasetKey} are available to export.`, 'info');
+      return;
+    }
+
+    const rows = gatherRowsForKeys(datasetKey, entries.map(item => item.sortKey));
+    if (!rows.length) {
+      setStatus(elements.comparisonStatus, `No unique rows from Dataset ${datasetKey} were found when preparing the download.`, 'info');
+      return;
+    }
+
+    const columns = getDatasetColumns(datasetKey);
+    const fileName = buildExportFileName(datasetKey, suffix, format);
+    if (format === 'xlsx') {
+      downloadXlsx(columns, rows, fileName);
+    } else {
+      downloadCsv(columns, rows, fileName);
+    }
+    setStatus(elements.comparisonStatus, `Download generated. Check your browser downloads for the Dataset ${datasetKey} export.`, 'success');
   }
 
   function escapeHtml(text) {
@@ -546,6 +833,8 @@ const ColumnComparer = (() => {
         </tr>
       `
     );
+
+    updateExportControls();
   }
 
   function formatNumber(value) {
@@ -563,8 +852,15 @@ const ColumnComparer = (() => {
 
     try {
       const results = computeComparison(state.datasets.A, state.datasets.B, state.selections.A, state.selections.B, options);
-      state.results = results;
-      renderResults(results, state.datasets.A, state.datasets.B, state.selections.A, state.selections.B);
+      state.results = {
+        ...results,
+        metadata: {
+          columnA: state.selections.A,
+          columnB: state.selections.B,
+          options
+        }
+      };
+      renderResults(state.results, state.datasets.A, state.datasets.B, state.selections.A, state.selections.B);
       setStatus(elements.comparisonStatus, 'Comparison complete. Scroll down to review the results.', 'success');
       AppUI.setSectionCollapsed('selectionSection', true);
     } catch (error) {
@@ -695,6 +991,7 @@ const ColumnComparer = (() => {
       if (elements.columnSelects.B) {
         resetColumnSelect(elements.columnSelects.B, 'B');
       }
+      updateExportControls();
     }
   };
 })();
