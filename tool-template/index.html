@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tool Starter Template</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>Tool Starter Template</h1>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="setup-panel" id="setupPanel">
+        <!-- Graph Token Section -->
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
+            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
+            <h3 style="margin: 0;">Microsoft Graph Token</h3>
+          </div>
+
+          <div class="collapsible-content" id="tokenSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">1</span>
+                Connect to Microsoft Graph
+              </h3>
+              <p class="helper-text">
+                Paste the access token from <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noreferrer">Microsoft Graph Explorer</a> to reuse it across tools.
+              </p>
+              <div class="form-group">
+                <label for="graphToken">Access Token:</label>
+                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
+                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('inputSection')">
+            <span class="collapse-icon" id="inputSectionIcon">▼</span>
+            <h3 style="margin: 0;">Input</h3>
+          </div>
+
+          <div class="collapsible-content" id="inputSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">2</span>
+                Provide Source Data
+              </h3>
+              <p class="helper-text">Use any of these starter controls and replace them with fields specific to your tool.</p>
+              <div class="form-group">
+                <label for="inputText">Sample Text Field</label>
+                <input type="text" id="inputText" placeholder="Enter a value">
+              </div>
+              <div class="form-group">
+                <label for="inputSelect">Sample Dropdown</label>
+                <select id="inputSelect">
+                  <option value="">Select an option</option>
+                  <option value="optionA">Option A</option>
+                  <option value="optionB">Option B</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="inputFile">Sample File Upload</label>
+                <div class="file-upload">
+                  <input type="file" id="inputFile">
+                  <label class="file-upload-label" for="inputFile">
+                    📁 Click to upload
+                    <br>
+                    <small>Accepts any file type in this template.</small>
+                  </label>
+                </div>
+              </div>
+              <button class="btn btn-primary" id="inputActionButton">Run Template Action</button>
+              <div class="status-message" id="inputStatus" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('settingsSection')">
+            <span class="collapse-icon" id="settingsSectionIcon">▼</span>
+            <h3 style="margin: 0;">Settings</h3>
+          </div>
+
+          <div class="collapsible-content" id="settingsSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">3</span>
+                Configure Behavior
+              </h3>
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="settingToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Enable Sample Toggle</div>
+                  <small class="form-hint">Use toggles for boolean flags or feature switches.</small>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="settingNumber">Sample Numeric Setting</label>
+                <input type="number" id="settingNumber" value="5" min="1" max="10">
+              </div>
+              <div class="form-group">
+                <label for="settingNotes">Notes</label>
+                <textarea id="settingNotes" rows="3" placeholder="Capture reminders about how this tool works."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="viz-container">
+        <section class="template-state" id="templateState">
+          <h2>Ready to Build</h2>
+          <p>
+            This area is intentionally minimal. Replace it with tables, charts, or any visualization that your tool requires.
+          </p>
+          <ul>
+            <li>The badge below updates when the template action runs.</li>
+            <li>Reuse the helper functions in <code>../shared/ui.js</code> and <code>../shared/graph-token.js</code>.</li>
+          </ul>
+          <div class="result-badge" id="resultBadge">No actions run yet.</div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/graph-token.js"></script>
+  <script src="template.js"></script>
+</body>
+</html>
