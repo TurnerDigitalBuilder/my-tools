@@ -20,31 +20,6 @@
     <div class="main-content">
       <aside class="setup-panel" id="setupPanel">
         <div class="collapsible-section">
-          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
-            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
-            <h3 style="margin: 0;">Microsoft Graph Token</h3>
-          </div>
-
-          <div class="collapsible-content" id="tokenSection">
-            <div class="wizard-step">
-              <h3>
-                <span class="step-number">1</span>
-                Optional: Store Your Graph Token
-              </h3>
-              <p class="helper-text">
-                Paste a Microsoft Graph Explorer access token to reuse it across every tool. This comparison utility does not
-                call Graph, but the shared token storage keeps your workspace in sync.
-              </p>
-              <div class="form-group">
-                <label for="graphToken">Access Token:</label>
-                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
-                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="collapsible-section">
           <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
             <span class="collapse-icon" id="loadSectionIcon">▼</span>
             <h3 style="margin: 0;">Load Datasets</h3>
@@ -53,7 +28,7 @@
           <div class="collapsible-content" id="loadSection">
             <div class="wizard-step">
               <h3>
-                <span class="step-number">2</span>
+                <span class="step-number">1</span>
                 Upload CSV or Excel Files
               </h3>
               <p class="helper-text">Choose one file for each dataset. The first row should contain column headers.</p>
@@ -96,7 +71,7 @@
           <div class="collapsible-content" id="selectionSection">
             <div class="wizard-step">
               <h3>
-                <span class="step-number">3</span>
+                <span class="step-number">2</span>
                 Choose Columns to Compare
               </h3>
               <p class="helper-text">Columns populate after each dataset loads. Only non-empty values are considered when the blank filter is enabled.</p>
@@ -292,12 +267,10 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="../shared/ui.js"></script>
-  <script src="../shared/graph-token.js"></script>
   <script src="comparer.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       AppUI.initialize();
-      AppUI.setSectionCollapsed('tokenSection', true);
       ColumnComparer.initialize();
     });
   </script>
