@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Email Lookup</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>User Email Lookup</h1>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="setup-panel" id="setupPanel">
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('tokenSection')">
+            <span class="collapse-icon" id="tokenSectionIcon">▼</span>
+            <h3 style="margin: 0;">Microsoft Graph Token</h3>
+          </div>
+          <div class="collapsible-content" id="tokenSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">1</span>
+                Connect to Microsoft Graph
+              </h3>
+              <p class="helper-text">
+                Paste a Microsoft Graph Explorer access token. The tool reuses stored tokens, so you only need to paste it once per session.
+              </p>
+              <div class="form-group">
+                <label for="graphToken">Access Token</label>
+                <input type="password" id="graphToken" placeholder="Paste your Microsoft Graph access token here...">
+                <small class="form-hint" id="tokenStatus">No token stored yet.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
+            <span class="collapse-icon" id="loadSectionIcon">▼</span>
+            <h3 style="margin: 0;">Lookup Names</h3>
+          </div>
+          <div class="collapsible-content" id="loadSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">2</span>
+                Paste the user list
+              </h3>
+              <p class="helper-text">Enter one name per line. Blank lines are ignored automatically.</p>
+              <div class="form-group">
+                <label for="namesInput">Names to lookup</label>
+                <textarea id="namesInput" rows="10" placeholder="Example:\nAnkita Raut\nBethany Legg\nBhavya Malhotra"></textarea>
+                <div class="input-meta" id="namesCount">0 names detected.</div>
+              </div>
+              <div class="button-row">
+                <button class="btn btn-primary" id="lookupButton" type="button">Lookup Emails</button>
+                <button class="btn btn-secondary" id="clearButton" type="button">Clear</button>
+              </div>
+              <div class="status-message" id="lookupStatus" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('settingsSection')">
+            <span class="collapse-icon" id="settingsSectionIcon">▼</span>
+            <h3 style="margin: 0;">Lookup Options</h3>
+          </div>
+          <div class="collapsible-content" id="settingsSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">3</span>
+                Tune the search behavior
+              </h3>
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="exactMatchToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Prioritize exact display name matches</div>
+                  <small class="form-hint">Return exact (case-insensitive) display name matches before partial matches when multiple results are found.</small>
+                </div>
+              </div>
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="dedupeToggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Remove duplicate names</div>
+                  <small class="form-hint">Skip duplicate lines to reduce redundant Microsoft Graph calls.</small>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="throttleInput">Delay between requests (ms)</label>
+                <input type="number" id="throttleInput" class="small-input" min="0" max="2000" step="50" value="150">
+                <small class="form-hint">Use a short delay to prevent throttling when processing long lists.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="viz-container">
+        <section class="results-panel" id="resultsPanel">
+          <h2>Lookup Results</h2>
+          <p class="helper-text" id="resultsSummary">Paste names and run a lookup to populate this table.</p>
+          <div class="button-row results-actions" id="resultsActions" style="display: none;">
+            <button class="btn btn-secondary" id="copyButton" type="button">Copy Table</button>
+            <button class="btn btn-secondary" id="downloadButton" type="button">Download CSV</button>
+          </div>
+          <div class="table-container" id="resultsContainer">
+            <table class="results-table" id="resultsTable">
+              <thead>
+                <tr>
+                  <th scope="col">Input Name</th>
+                  <th scope="col">Primary Email</th>
+                  <th scope="col">Matched Display Name</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody">
+                <tr class="empty-row">
+                  <td colspan="4">No results yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../shared/ui.js"></script>
+  <script src="../shared/graph-token.js"></script>
+  <script src="email-lookup.js"></script>
+</body>
+</html>
