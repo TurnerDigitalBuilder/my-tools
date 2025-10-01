@@ -123,6 +123,17 @@
                 </div>
               </div>
 
+              <div class="form-group toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="emailUsernameToggle">
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <div class="form-label">Match Email Usernames Only</div>
+                  <small class="form-hint">When checked, compare the portion before the @ symbol so different domains for the same user count as a match.</small>
+                </div>
+              </div>
+
               <button class="btn btn-primary" id="compareButton" disabled>Run Comparison</button>
               <div class="status-message" id="comparisonStatus" role="status" aria-live="polite"></div>
             </div>

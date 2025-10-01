@@ -33,7 +33,8 @@ const ColumnComparer = (() => {
     elements.optionToggles = {
       ignoreCase: document.getElementById('ignoreCaseToggle'),
       trim: document.getElementById('trimToggle'),
-      skipBlank: document.getElementById('skipBlankToggle')
+      skipBlank: document.getElementById('skipBlankToggle'),
+      emailUsernameOnly: document.getElementById('emailUsernameToggle')
     };
     elements.compareButton = document.getElementById('compareButton');
     elements.comparisonStatus = document.getElementById('comparisonStatus');
@@ -110,6 +111,10 @@ const ColumnComparer = (() => {
     });
 
     elements.optionToggles.skipBlank?.addEventListener('change', () => {
+      invalidateResults('Comparison options changed. Run the comparison again to refresh results.');
+    });
+
+    elements.optionToggles.emailUsernameOnly?.addEventListener('change', () => {
       invalidateResults('Comparison options changed. Run the comparison again to refresh results.');
     });
 
@@ -285,7 +290,8 @@ const ColumnComparer = (() => {
     return {
       ignoreCase: Boolean(elements.optionToggles.ignoreCase?.checked),
       trim: Boolean(elements.optionToggles.trim?.checked),
-      skipBlank: Boolean(elements.optionToggles.skipBlank?.checked)
+      skipBlank: Boolean(elements.optionToggles.skipBlank?.checked),
+      emailUsernameOnly: Boolean(elements.optionToggles.emailUsernameOnly?.checked)
     };
   }
 
@@ -308,11 +314,27 @@ const ColumnComparer = (() => {
       return null;
     }
 
-    const normalized = options.ignoreCase ? text.toLowerCase() : text;
+    let displayText = text;
+    let baseForNormalization = text;
+
+    if (options.emailUsernameOnly) {
+      const atIndex = text.indexOf('@');
+      if (atIndex !== -1) {
+        const username = text.slice(0, atIndex);
+        const cleanedUsername = options.trim ? username.trim() : username;
+        if (cleanedUsername.length === 0 && options.skipBlank) {
+          return null;
+        }
+        baseForNormalization = cleanedUsername;
+        displayText = cleanedUsername || username || displayText;
+      }
+    }
+
+    const normalized = options.ignoreCase ? baseForNormalization.toLowerCase() : baseForNormalization;
 
     return {
       normalized,
-      display: text
+      display: displayText
     };
   }
 
@@ -713,8 +735,12 @@ const ColumnComparer = (() => {
     elements.duplicatesSection.hidden = false;
 
     const overviewParts = [];
+    const comparisonOptions = results?.metadata?.options || {};
     overviewParts.push(`Comparing ${formatNumber(results.totals.valuesComparedA)} values from ${datasetA.fileName}`);
     overviewParts.push(`against ${formatNumber(results.totals.valuesComparedB)} values from ${datasetB.fileName}.`);
+    if (comparisonOptions.emailUsernameOnly) {
+      overviewParts.push('Email domains are ignored because username-only matching is enabled.');
+    }
     elements.overviewDescription.textContent = overviewParts.join(' ');
 
     if (elements.selectedColumns) {
@@ -746,29 +772,42 @@ const ColumnComparer = (() => {
         {
           title: 'Values in Both Files',
           value: formatNumber(results.totals.matches),
-          subtext: 'Shared across the selected columns'
+          subtext: 'Shared across the selected columns',
+          href: '#matchesSection'
         },
         {
           title: 'Only in Dataset A',
           value: formatNumber(results.totals.onlyA),
-          subtext: 'Missing from Dataset B'
+          subtext: 'Missing from Dataset B',
+          href: '#onlyASection'
         },
         {
           title: 'Only in Dataset B',
           value: formatNumber(results.totals.onlyB),
-          subtext: 'Missing from Dataset A'
+          subtext: 'Missing from Dataset A',
+          href: '#onlyBSection'
         }
       ];
 
       elements.summaryGrid.innerHTML = metrics
         .map(metric => {
-          return `
-            <article class="summary-card">
+          const cardInner = `
               <h4>${escapeHtml(metric.title)}</h4>
               <div class="metric-value">${escapeHtml(metric.value)}</div>
               <div class="metric-subtext">${escapeHtml(metric.subtext)}</div>
-            </article>
-          `;
+            `.trim();
+          if (metric.href) {
+            return `
+              <a class="summary-card summary-card--link" href="${escapeHtml(metric.href)}">
+                ${cardInner}
+              </a>
+            `;
+          }
+          return `
+              <article class="summary-card">
+                ${cardInner}
+              </article>
+            `;
         })
         .join('');
     }
