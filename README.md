@@ -6,7 +6,7 @@ This repository hosts a suite of Microsoft 365 helper utilities that intentional
 - **Organization License Viewer** (`/org-license-viewer`): Visualize reporting lines, highlight ChatGPT license coverage, and explore team metrics with collapsible chart controls.
 - **Profile Data Appender** (`/user-data-appender`): Upload CSV/Excel files, append Microsoft 365 profile attributes, and export enriched lists with progress and status messaging.
 - **User Email Lookup** (`/user-email-lookup`): Paste a list of display names and fetch primary email addresses from Microsoft Graph with duplicate trimming, throttling controls, and export-friendly results.
-- **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to surface overlaps, gaps, and duplicates with configurable matching rules. Export filtered CSV or Excel files for shared values or rows unique to each source. This tool is fully offline and intentionally omits the Microsoft Graph token panel.
+- **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to surface overlaps, gaps, and duplicates with configurable matching rules. Export filtered CSV or Excel files for shared values or rows unique to each source. Overview summary cards link directly to the detailed tables, and an email username-only option helps match accounts that use different domains. This tool is fully offline and intentionally omits the Microsoft Graph token panel.
 - **Tool Starter Template** (`/tool-template`): A baseline layout with Microsoft Graph token handling, collapsible input/settings panels, and a neutral main canvas ready for custom visualizations.
 
 ## Shared Design System
