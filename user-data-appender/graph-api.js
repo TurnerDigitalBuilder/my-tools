@@ -18,8 +18,19 @@ const GraphAPI = (function() {
     { key: 'surname', label: 'Surname' }
   ];
 
+  const defaultBackupDomain = 'tcco.com';
   let accessToken = '';
   let loginDomain = '';
+
+  function normalizeDomainInput(value) {
+    if (!value || typeof value !== 'string') return '';
+    return value.replace(/^@+/, '').trim().toLowerCase();
+  }
+
+  function formatDomainForDisplay(value) {
+    const normalized = normalizeDomainInput(value);
+    return normalized ? `@${normalized}` : '';
+  }
 
   function decodeJwtPayload(token) {
     if (!token || typeof token !== 'string') {
@@ -80,6 +91,31 @@ const GraphAPI = (function() {
     updateFetchButtonState();
   }
 
+  function getBackupDomain() {
+    const input = document.getElementById('backupDomain');
+    if (!input) return defaultBackupDomain;
+
+    const normalized = normalizeDomainInput(input.value);
+    return normalized || defaultBackupDomain;
+  }
+
+  function syncBackupDomainInput() {
+    const input = document.getElementById('backupDomain');
+    if (!input) return;
+
+    const normalized = normalizeDomainInput(input.value);
+    const domainToDisplay = formatDomainForDisplay(normalized || defaultBackupDomain);
+    input.value = domainToDisplay;
+  }
+
+  function appendIdentifierIfNew(list, candidate) {
+    if (!candidate) return;
+    const lowerCandidate = candidate.toLowerCase();
+    if (!list.some(value => value.toLowerCase() === lowerCandidate)) {
+      list.push(candidate);
+    }
+  }
+
   function buildLookupContext(emailValue) {
     const rawEmail = typeof emailValue === 'string' ? emailValue : '';
     const normalizedEmail = rawEmail.trim();
@@ -93,18 +129,22 @@ const GraphAPI = (function() {
     }
 
     const identifiers = [];
-    identifiers.push(normalizedEmail);
+    appendIdentifierIfNew(identifiers, normalizedEmail);
 
     const normalizedDomain = loginDomain ? loginDomain.replace(/^@/, '').toLowerCase() : '';
     const separatorIndex = normalizedEmail.indexOf('@');
     const localPart = separatorIndex !== -1 ? normalizedEmail.slice(0, separatorIndex) : normalizedEmail;
+    const emailDomain = separatorIndex !== -1 ? normalizedEmail.slice(separatorIndex + 1).toLowerCase() : '';
 
     if (normalizedDomain && localPart) {
       const swappedIdentifier = `${localPart}@${normalizedDomain}`;
-      const lowerSwapped = swappedIdentifier.toLowerCase();
-      if (!identifiers.some(value => value.toLowerCase() === lowerSwapped)) {
-        identifiers.push(swappedIdentifier);
-      }
+      appendIdentifierIfNew(identifiers, swappedIdentifier);
+    }
+
+    const backupDomain = getBackupDomain();
+    if (backupDomain && localPart && backupDomain !== emailDomain) {
+      const fallbackIdentifier = `${localPart}@${backupDomain}`;
+      appendIdentifierIfNew(identifiers, fallbackIdentifier);
     }
 
     return {
@@ -563,6 +603,17 @@ const GraphAPI = (function() {
     const excelButton = document.getElementById('downloadExcelButton');
     if (excelButton) {
       excelButton.addEventListener('click', downloadExcel);
+    }
+
+    const backupDomainInput = document.getElementById('backupDomain');
+    if (backupDomainInput) {
+      syncBackupDomainInput();
+      ['change', 'blur'].forEach(eventName => {
+        backupDomainInput.addEventListener(eventName, () => {
+          syncBackupDomainInput();
+          updateFetchButtonState();
+        });
+      });
     }
 
     document.addEventListener('datatable:change', () => {

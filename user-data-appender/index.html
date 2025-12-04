@@ -100,6 +100,12 @@
           </div>
 
           <div class="form-group">
+            <label for="backupDomain">Backup email domain</label>
+            <input type="text" id="backupDomain" value="@tcco.com" placeholder="@tcco.com">
+            <small class="form-hint">The app checks the email as provided first. If the user is not found, it retries with this domain using the same username.</small>
+          </div>
+
+          <div class="form-group">
             <label>Append Location:</label>
             <div class="inline-options">
               <label class="inline-option"><input type="radio" name="appendMode" value="end" checked> Append to end</label>
