@@ -7,6 +7,7 @@ This repository hosts a suite of Microsoft 365 helper utilities that intentional
 - **Profile Data Appender** (`/user-data-appender`): Upload CSV/Excel files, append Microsoft 365 profile attributes, and export enriched lists with progress and status messaging. Includes a backup email domain input (defaults to `@tcco.com`) so lookups retry with the fallback domain if the original address is not found.
 - **User Email Lookup** (`/user-email-lookup`): Paste a list of display names and fetch primary email addresses from Microsoft Graph with duplicate trimming, throttling controls, and export-friendly results.
 - **Column Comparison Tool** (`/column-compare`): Compare columns from two CSV/Excel files to surface overlaps, gaps, and duplicates with configurable matching rules. Export filtered CSV or Excel files for shared values or rows unique to each source. Overview summary cards link directly to the detailed tables, and an email username-only option helps match accounts that use different domains. This tool is fully offline and intentionally omits the Microsoft Graph token panel.
+- **Individual Email Drafter** (`/individual-email-drafter`): Generate per-recipient drafts from CSV, Excel, or pasted email lists. Set subject, CC, BCC, and choose between plain-text or HTML bodies, then open mailto drafts or bulk-copy all messages.
 - **Tool Starter Template** (`/tool-template`): A baseline layout with Microsoft Graph token handling, collapsible input/settings panels, and a neutral main canvas ready for custom visualizations.
 
 ## Shared Design System
