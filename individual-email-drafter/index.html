@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Individual Email Drafter</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>Individual Email Drafter</h1>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="../index.html">🏠 Home</a>
+        <button class="btn btn-secondary" onclick="AppUI.toggleDarkMode()">🌙 Dark Mode</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="setup-panel" id="setupPanel">
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('loadSection')">
+            <span class="collapse-icon" id="loadSectionIcon">▼</span>
+            <h3 style="margin: 0;">Load Recipients</h3>
+          </div>
+          <div class="collapsible-content" id="loadSection">
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">1</span>
+                Upload a CSV or Excel file
+              </h3>
+              <p class="helper-text">
+                Include a column named <strong>Email</strong> (case-insensitive). Optional name columns will be used in previews if present.
+              </p>
+              <div class="form-group">
+                <label for="recipientFile">Recipients file</label>
+                <input type="file" id="recipientFile" accept=".csv,.xlsx,.xls">
+              </div>
+              <small class="form-hint" id="fileStatus">No file selected yet.</small>
+            </div>
+
+            <div class="wizard-step">
+              <h3>
+                <span class="step-number">2</span>
+                Or paste recipients
+              </h3>
+              <p class="helper-text">
+                Paste email addresses separated by commas, semicolons, or new lines. Names will be ignored for pasted lists.
+              </p>
+              <div class="form-group">
+                <label for="pastedRecipients">Pasted list</label>
+                <textarea id="pastedRecipients" rows="4" placeholder="one@example.com\nanother@example.com"></textarea>
+              </div>
+              <div class="button-row">
+                <button class="btn btn-primary" id="addPastedButton" type="button">Add Recipients</button>
+                <button class="btn btn-secondary" id="clearPastedButton" type="button">Clear</button>
+              </div>
+            </div>
+
+            <div class="status-message" id="loadStatus" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <div class="collapsible-header" onclick="AppUI.toggleSection('composeSection')">
+            <span class="collapse-icon" id="composeSectionIcon">▼</span>
+            <h3 style="margin: 0;">Compose Email</h3>
+          </div>
+          <div class="collapsible-content" id="composeSection">
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" id="subject" placeholder="Enter a subject">
+            </div>
+
+            <div class="grid two-col">
+              <div class="form-group">
+                <label for="cc">CC (optional)</label>
+                <input type="text" id="cc" placeholder="cc@example.com; cc2@example.com">
+              </div>
+              <div class="form-group">
+                <label for="bcc">BCC (optional)</label>
+                <input type="text" id="bcc" placeholder="bcc@example.com; bcc2@example.com">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="body">Email body (plain text)</label>
+              <textarea id="body" rows="8" placeholder="Type your message or paste from another editor"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="htmlBody">HTML email body (optional)</label>
+              <textarea id="htmlBody" rows="8" placeholder="Paste HTML to use rich formatting in generated drafts"></textarea>
+              <small class="form-hint">If provided, the HTML version is used when copying drafts. Mailto links rely on your mail client to interpret HTML.</small>
+            </div>
+
+            <div class="form-group checkbox-row">
+              <input type="checkbox" id="useHtml">
+              <label for="useHtml">Prefer HTML body when copying drafts</label>
+            </div>
+
+            <div class="button-row">
+              <button class="btn btn-primary" id="updateDraftsButton" type="button">Update Drafts</button>
+              <button class="btn btn-secondary" id="resetFormButton" type="button">Reset</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="viz-container">
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card">
+            <div class="summary-title">Recipients loaded</div>
+            <div class="summary-value" id="recipientCount">0</div>
+            <div class="summary-meta" id="recipientMeta">No recipients added yet.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">Duplicates removed</div>
+            <div class="summary-value" id="duplicateCount">0</div>
+            <div class="summary-meta">Case-insensitive, based on email address.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">Draft readiness</div>
+            <div class="summary-value" id="draftStatus">Awaiting recipients</div>
+            <div class="summary-meta" id="draftMeta">Add recipients and a subject to generate drafts.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 style="margin: 0;">Recipient List</h2>
+              <p class="helper-text" id="recipientListMeta">Names are optional and pulled from your file when available.</p>
+            </div>
+            <div class="button-row">
+              <button class="btn btn-secondary" id="copyAllButton" type="button" disabled>Copy All Drafts</button>
+              <button class="btn btn-secondary" id="clearRecipientsButton" type="button">Clear Recipients</button>
+            </div>
+          </div>
+
+          <div class="recipient-table" id="recipientTable" role="table" aria-label="Recipient drafts">
+            <div class="table-header" role="row">
+              <div class="cell" role="columnheader">Recipient</div>
+              <div class="cell" role="columnheader">Actions</div>
+            </div>
+            <div id="recipientRows" class="table-body" role="rowgroup"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="mailer.js"></script>
+</body>
+</html>
